@@ -29,7 +29,7 @@ class AppTextStyles {
 
   // Brand wordmark: friendly and modern with heavier weight.
   static final TextStyle wordmark = _outfit(
-    color: AppColors.sage900,
+    color: AppColors.textPrimary,
     fontSize: 28,
     fontWeight: FontWeight.w800,
     letterSpacing: 0.2,
@@ -37,14 +37,28 @@ class AppTextStyles {
 
   // Subtitle: understated small-caps feeling.
   static final TextStyle subtitleCaps = _outfit(
-    color: AppColors.sage500,
+    color: AppColors.textSecondary,
     fontSize: 12,
     fontWeight: FontWeight.w500,
     letterSpacing: 1.2,
   );
 
+  static final TextStyle headline = _outfit(
+    color: AppColors.textPrimary,
+    fontSize: 26,
+    fontWeight: FontWeight.w700,
+    height: 1.3,
+  );
+
+  static final TextStyle body = _outfit(
+    color: AppColors.textSecondary,
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    height: 1.45,
+  );
+
   static final TextStyle navItemActive = _outfit(
-    color: AppColors.sage600,
+    color: AppColors.primary,
     fontSize: 11,
     fontWeight: FontWeight.w500,
   );
@@ -56,21 +70,21 @@ class AppTextStyles {
   );
 
   static final TextStyle buttonLabel = _outfit(
-    color: AppColors.surface,
+    color: AppColors.onPrimary,
     fontSize: 16,
     fontWeight: FontWeight.w600,
     letterSpacing: 0.2,
   );
 
   static final TextStyle taskTitle = _outfit(
-    color: AppColors.sage900,
+    color: AppColors.textPrimary,
     fontSize: 15,
     fontWeight: FontWeight.w500,
     height: 1.3,
   );
 
   static final TextStyle taskSubtitle = _outfit(
-    color: AppColors.sage500,
+    color: AppColors.textSecondary,
     fontSize: 12,
     fontWeight: FontWeight.w400,
   );
