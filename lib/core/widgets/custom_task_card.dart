@@ -3,147 +3,137 @@ import 'package:flutter/material.dart';
 import '../theme/theme.dart';
 
 class CustomTaskCard extends StatelessWidget {
-  const CustomTaskCard({super.key});
+  const CustomTaskCard({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    this.leadingIcon,
+    this.leadingIconColor = AppColors.primary,
+    this.leadingBackgroundColor = AppColors.neutral100,
+    this.trailing,
+    this.selected = false,
+    this.onTap,
+    this.borderRadius = 20,
+    this.padding = const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
+    this.titleStyle,
+    this.subtitleStyle,
+    this.borderColor,
+  });
+
+  final String title;
+  final String subtitle;
+  final Widget? leadingIcon;
+  final Color leadingIconColor;
+  final Color leadingBackgroundColor;
+  final Widget? trailing;
+  final bool selected;
+  final VoidCallback? onTap;
+  final double borderRadius;
+  final EdgeInsetsGeometry padding;
+  final TextStyle? titleStyle;
+  final TextStyle? subtitleStyle;
+  final Color? borderColor;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
-          decoration: ShapeDecoration(
-            color: AppColors.surface,
-            shape: RoundedRectangleBorder(
-              side: BorderSide(
-                width: 1,
-                color: AppColors.neutral250,
+    final card = Container(
+      width: double.infinity,
+      padding: padding,
+      decoration: ShapeDecoration(
+        color: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+            width: 1,
+            color: borderColor ?? AppColors.neutral250,
+          ),
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: ShapeDecoration(
+              color: leadingBackgroundColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
               ),
-              borderRadius: BorderRadius.circular(20),
+            ),
+            alignment: Alignment.center,
+            child:
+                leadingIcon ??
+                Icon(
+                  Icons.task_alt_outlined,
+                  size: 22,
+                  color: leadingIconColor,
+                ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: titleStyle ?? AppTextStyles.taskTitle,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: subtitleStyle ?? AppTextStyles.taskSubtitle,
+                ),
+              ],
             ),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            spacing: 14,
-            children: [
+          const SizedBox(width: 12),
+          trailing ??
               Container(
-                width: 44,
-                height: 44,
+                width: 22,
+                height: 22,
                 decoration: ShapeDecoration(
-                  color: AppColors.neutral100,
+                  color: selected ? AppColors.primary : Colors.transparent,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                    side: BorderSide(
+                      width: 1,
+                      color: selected ? AppColors.primary : AppColors.neutral300,
+                    ),
+                    borderRadius: BorderRadius.circular(11),
                   ),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 22,
-                      height: 22,
-                      clipBehavior: Clip.antiAlias,
-                      decoration: BoxDecoration(),
-                      child: Stack(),
-                    ),
-                  ],
-                ),
-              ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 2,
-                children: [
-                  Container(
-                    width: double.infinity,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: 102.63,
-                          child: Text(
-                            'Public speaking',
-                            style: AppTextStyles.taskTitle,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: 142.08,
-                          child: Text(
-                            'Presentations, talks, toasts',
-                            style: AppTextStyles.taskSubtitle,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              Expanded(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minWidth: 22),
-                  child: Container(
-                    height: 22,
-                    padding: const EdgeInsets.only(left: 116.03),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Container(
-                          width: 22,
-                          height: 22,
-                          decoration: ShapeDecoration(
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                width: 1,
-                                color: AppColors.neutral300,
-                              ),
-                              borderRadius: BorderRadius.circular(11),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Opacity(
-                                opacity: 0,
-                                child: Container(
-                                  width: 12,
-                                  height: 12,
-                                  clipBehavior: Clip.antiAlias,
-                                  decoration: BoxDecoration(),
-                                  child: Stack(),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                alignment: Alignment.center,
+                child: AnimatedOpacity(
+                  opacity: selected ? 1 : 0,
+                  duration: const Duration(milliseconds: 180),
+                  child: const Icon(
+                    Icons.check,
+                    size: 12,
+                    color: Colors.white,
                   ),
                 ),
               ),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
+    );
+
+    if (onTap == null) {
+      return card;
+    }
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: card,
+      ),
     );
   }
 }
