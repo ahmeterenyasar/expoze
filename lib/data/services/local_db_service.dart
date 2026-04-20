@@ -1,3 +1,6 @@
+import 'package:isar/isar.dart';
+import 'package:path_provider/path_provider.dart';
+
 import '../models/task_model.dart';
 import '../models/user_model.dart';
 
@@ -15,69 +18,109 @@ abstract class ILocalDbService {
 }
 
 class LocalDbService implements ILocalDbService {
-  final Map<String, TaskModel> _taskStore = <String, TaskModel>{};
-  UserModel? _user;
+  Isar? _isar;
   bool _isInitialized = false;
 
   @override
   Future<void> init() async {
-    // Real implementation can initialize Isar/Hive and adapters/collections.
+    if (_isInitialized) {
+      return;
+    }
+
+    _isar = await Isar.open(
+      <CollectionSchema>[
+        TaskModelSchema,
+        UserModelSchema,
+      ],
+      name: 'expoze_db',
+      directory: (await getApplicationDocumentsDirectory()).path,
+      inspector: true,
+    );
+
     _isInitialized = true;
   }
 
-  void _ensureInitialized() {
+  Isar _ensureInitialized() {
     if (!_isInitialized) {
       throw StateError('LocalDbService is not initialized. Call init() first.');
     }
+
+    final isar = _isar;
+    if (isar == null || isar.isOpen == false) {
+      throw StateError('Isar instance is unavailable.');
+    }
+
+    return isar;
   }
 
   @override
   Future<List<TaskModel>> getAllTasks() async {
-    _ensureInitialized();
-    return _taskStore.values.toList()..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    final isar = _ensureInitialized();
+    return isar.taskModels.where().sortByCreatedAtDesc().findAll();
   }
 
   @override
-  Future<TaskModel?> getTaskById(String id) async {
-    _ensureInitialized();
-    return _taskStore[id];
+  Future<TaskModel?> getTaskById(String taskId) async {
+    final isar = _ensureInitialized();
+    return isar.taskModels.filter().taskIdEqualTo(taskId).findFirst();
   }
 
   @override
   Future<void> upsertTask(TaskModel task) async {
-    _ensureInitialized();
-    _taskStore[task.id] = task;
+    final isar = _ensureInitialized();
+
+    await isar.writeTxn(() async {
+      await isar.taskModels.put(task);
+    });
   }
 
   @override
   Future<void> upsertTasks(List<TaskModel> tasks) async {
-    _ensureInitialized();
-    for (final task in tasks) {
-      _taskStore[task.id] = task;
+    if (tasks.isEmpty) {
+      return;
     }
+
+    final isar = _ensureInitialized();
+
+    await isar.writeTxn(() async {
+      await isar.taskModels.putAll(tasks);
+    });
   }
 
   @override
-  Future<void> deleteTask(String id) async {
-    _ensureInitialized();
-    _taskStore.remove(id);
+  Future<void> deleteTask(String taskId) async {
+    final isar = _ensureInitialized();
+
+    await isar.writeTxn(() async {
+      await isar.taskModels.deleteByTaskId(taskId);
+    });
   }
 
   @override
   Future<void> clearTasks() async {
-    _ensureInitialized();
-    _taskStore.clear();
+    final isar = _ensureInitialized();
+
+    await isar.writeTxn(() async {
+      await isar.taskModels.clear();
+    });
   }
 
   @override
   Future<void> saveUser(UserModel user) async {
-    _ensureInitialized();
-    _user = user;
+    final isar = _ensureInitialized();
+
+    await isar.writeTxn(() async {
+      final existing = await isar.userModels.filter().userIdEqualTo(user.userId).findFirst();
+      if (existing != null) {
+        user.id = existing.id;
+      }
+      await isar.userModels.put(user);
+    });
   }
 
   @override
   Future<UserModel?> getUser() async {
-    _ensureInitialized();
-    return _user;
+    final isar = _ensureInitialized();
+    return isar.userModels.where().findFirst();
   }
 }

@@ -1,6 +1,6 @@
 name: expoze
-description: "A new Flutter project."
-publish_to: 'none' 
+description: "A minimalist, gamified exposure therapy app."
+publish_to: 'none'
 version: 1.0.0+1
 
 environment:
@@ -11,17 +11,48 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  
+  # State Management & Routing
   flutter_bloc: ^8.1.6
+  equatable: ^2.0.5
+  go_router: ^13.2.0
+  get_it: ^7.6.7
+
+  # UI & Design
   google_fonts: ^6.3.0
-  intl: ^0.20.2
   cupertino_icons: ^1.0.8
+  flutter_animate: ^4.5.0
+
+  # Localization
+  intl: ^0.20.2
+
+  # Data & Serialization
+  freezed_annotation: ^2.4.1
+  json_annotation: ^4.8.1
+
+  # Local Database (Isar)
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
+  path_provider: ^2.1.5
+
+  # Local AI (llama.cpp bindings - fllama is a stable choice)
+  fllama: ^0.0.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^5.0.0
 
-flutter:  
+  # Code Generators
+  build_runner: ^2.4.8
+  freezed: ^2.4.7
+  json_serializable: ^6.8.0
+  json_serializer: ^0.3.1
+  isar_generator: ^3.1.0+1
+
+flutter:
   uses-material-design: true
   generate: true
+  # Modeli buraya ekleyeceğiz (sonraki aşama)
+  # assets:
+  #   - assets/models/qwen3_0.6b_q4.gguf

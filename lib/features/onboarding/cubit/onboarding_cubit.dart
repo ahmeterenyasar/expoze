@@ -86,7 +86,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
     try {
       final existingUser = await _dbService.getUser();
-      final nextUser = (existingUser ?? const UserModel(id: _defaultUserId, currentCourageLevel: 1, totalXP: 0)).copyWith(
+      final nextUser = (existingUser ?? UserModel(userId: _defaultUserId, currentCourageLevel: 1, totalXP: 0)).copyWith(
         onboardingFocusAreas: List<String>.from(selected),
       );
 
@@ -154,7 +154,12 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     }
 
     try {
-      final user = UserModel(id: userId, currentCourageLevel: state.baselineCourageLevel!, totalXP: 0);
+      final user = UserModel(
+        userId: userId,
+        currentCourageLevel: state.baselineCourageLevel!,
+        totalXP: 0,
+        onboardingFocusAreas: List<String>.from(state.focusAreas),
+      );
 
       await _dbService.saveUser(user);
 
@@ -187,7 +192,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   }
 
   String? _validateAllSteps(OnboardingState current) {
-    if (current.focusArea == null || current.focusArea!.isEmpty) {
+    if (current.focusAreas.isEmpty) {
       return 'Focus area is required.';
     }
     if (current.currentAnxiety == null) {

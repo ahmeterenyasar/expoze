@@ -20,7 +20,7 @@ class LocalAIService implements ILocalAIService {
       final suggestedAnxiety = (clampedAnxiety + index).clamp(1, 10);
 
       return TaskModel(
-        id: '${now.microsecondsSinceEpoch}_$taskNumber',
+        taskId: '${now.microsecondsSinceEpoch}_$taskNumber',
         title: 'Exposure $taskNumber: $focusArea',
         description: 'Take a short action around "$focusArea" for 2-5 minutes.',
         anxietyLevel: suggestedAnxiety,
