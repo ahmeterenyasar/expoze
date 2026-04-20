@@ -28,40 +28,7 @@ class OnboardingScreen extends StatelessWidget {
 class _OnboardingView extends StatelessWidget {
   const _OnboardingView();
 
-  static const List<_FocusOption> _options = [
-    _FocusOption(
-      id: 'speaking',
-      title: 'Public speaking',
-      subtitle: 'Presentations, talks, toasts',
-      icon: Icons.mic_none_rounded,
-      iconBg: AppColors.sage150,
-      iconColor: AppColors.primary,
-    ),
-    _FocusOption(
-      id: 'strangers',
-      title: 'Meeting strangers',
-      subtitle: 'Networking, new places, events',
-      icon: Icons.group_outlined,
-      iconBg: Color(0xFFEEF0FB),
-      iconColor: AppColors.lilac500,
-    ),
-    _FocusOption(
-      id: 'eating',
-      title: 'Eating alone',
-      subtitle: 'Cafes, restaurants, lunch breaks',
-      icon: Icons.restaurant_menu_rounded,
-      iconBg: Color(0xFFFAF0EB),
-      iconColor: AppColors.orange600,
-    ),
-    _FocusOption(
-      id: 'calls',
-      title: 'Making phone calls',
-      subtitle: 'Appointments, orders, check-ins',
-      icon: Icons.call_outlined,
-      iconBg: Color(0xFFEAF3DE),
-      iconColor: AppColors.lime700,
-    ),
-  ];
+  static const List<_FocusArea> _options = _FocusArea.values;
 
   @override
   Widget build(BuildContext context) {
@@ -194,20 +161,89 @@ class _OnboardingView extends StatelessWidget {
   }
 }
 
-class _FocusOption {
-  const _FocusOption({
-    required this.id,
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.iconBg,
-    required this.iconColor,
-  });
+enum _FocusArea {
+  speaking,
+  strangers,
+  eating,
+  calls,
+}
 
-  final String id;
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final Color iconBg;
-  final Color iconColor;
+extension _FocusAreaX on _FocusArea {
+  String get id {
+    switch (this) {
+      case _FocusArea.speaking:
+        return 'speaking';
+      case _FocusArea.strangers:
+        return 'strangers';
+      case _FocusArea.eating:
+        return 'eating';
+      case _FocusArea.calls:
+        return 'calls';
+    }
+  }
+
+  String get title {
+    switch (this) {
+      case _FocusArea.speaking:
+        return 'Public speaking';
+      case _FocusArea.strangers:
+        return 'Meeting strangers';
+      case _FocusArea.eating:
+        return 'Eating alone';
+      case _FocusArea.calls:
+        return 'Making phone calls';
+    }
+  }
+
+  String get subtitle {
+    switch (this) {
+      case _FocusArea.speaking:
+        return 'Presentations, talks, toasts';
+      case _FocusArea.strangers:
+        return 'Networking, new places, events';
+      case _FocusArea.eating:
+        return 'Cafes, restaurants, lunch breaks';
+      case _FocusArea.calls:
+        return 'Appointments, orders, check-ins';
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case _FocusArea.speaking:
+        return Icons.mic_none_rounded;
+      case _FocusArea.strangers:
+        return Icons.group_outlined;
+      case _FocusArea.eating:
+        return Icons.restaurant_menu_rounded;
+      case _FocusArea.calls:
+        return Icons.call_outlined;
+    }
+  }
+
+  Color get iconBg {
+    switch (this) {
+      case _FocusArea.speaking:
+        return AppColors.sage150;
+      case _FocusArea.strangers:
+        return const Color(0xFFEEF0FB);
+      case _FocusArea.eating:
+        return const Color(0xFFFAF0EB);
+      case _FocusArea.calls:
+        return const Color(0xFFEAF3DE);
+    }
+  }
+
+  Color get iconColor {
+    switch (this) {
+      case _FocusArea.speaking:
+        return AppColors.primary;
+      case _FocusArea.strangers:
+        return AppColors.lilac500;
+      case _FocusArea.eating:
+        return AppColors.orange600;
+      case _FocusArea.calls:
+        return AppColors.lime700;
+    }
+  }
 }
