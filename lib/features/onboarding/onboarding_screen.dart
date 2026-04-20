@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/theme/theme.dart';
 import '../../core/widgets/custom_button.dart';
-import '../../core/widgets/custom_selectable_chip.dart';
+import '../../core/widgets/custom_task_card.dart';
 import '../../data/services/local_db_service.dart';
 import 'cubit/onboarding_cubit.dart';
 import 'cubit/onboarding_state.dart';
@@ -68,15 +68,22 @@ class _OnboardingView extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.backgroundCream,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(28, 40, 28, 36),
-          child: BlocBuilder<OnboardingCubit, OnboardingState>(
-            builder: (context, state) {
-              final selectedIds = _selectedIdsFromState(state);
-              final selectedCount = selectedIds.length;
-              final canContinue = selectedCount > 0;
+        child: BlocConsumer<OnboardingCubit, OnboardingState>(
+          listener: (context, state) {
+            if (state.status == OnboardingStatus.error && state.errorMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.errorMessage!)),
+              );
+            }
+          },
+          builder: (context, state) {
+            final selectedIds = state.focusAreas.toSet();
+            final selectedCount = selectedIds.length;
+            final canContinue = selectedCount > 0;
 
-              return Column(
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(28, 20, 28, 20),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
@@ -133,27 +140,30 @@ class _OnboardingView extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final option = _options[index];
                         final isSelected = selectedIds.contains(option.id);
-                        return CustomSelectableChip(
+                        return CustomTaskCard(
                           title: option.title,
                           subtitle: option.subtitle,
-                          icon: option.icon,
-                          iconBackgroundColor: option.iconBg,
-                          iconColor: option.iconColor,
                           selected: isSelected,
-                          onTap: () => _toggleSelection(
-                            context,
-                            option.id,
-                            selectedIds,
-                          ),
+                          onTap: () => context.read<OnboardingCubit>().toggleFocusArea(option.id),
+                          leadingBackgroundColor: option.iconBg,
+                          leadingIconColor: option.iconColor,
+                          leadingIcon: Icon(option.icon, size: 22, color: option.iconColor),
+                          backgroundColor: AppColors.surface,
+                          selectedBackgroundColor: AppColors.sage150,
+                          borderColor: AppColors.neutral250,
+                          selectedBorderColor: AppColors.primary,
+                          borderWidth: 1.5,
+                          selectedBorderWidth: 2,
+                          selectedTitleColor: const Color(0xFF1D5C4F),
                         );
                       },
                     ),
                   ),
                   const SizedBox(height: 20),
                   CustomButton(
-                    label: 'Continue',
-                    enabled: canContinue,
-                    onPressed: canContinue ? () => context.read<OnboardingCubit>().nextStep() : null,
+                    label: state.isSavingFocusAreas ? 'Saving...' : 'Continue',
+                    enabled: canContinue && !state.isSavingFocusAreas,
+                    onPressed: canContinue && !state.isSavingFocusAreas ? () => context.read<OnboardingCubit>().saveStepOneAndContinue() : null,
                   ),
                   const SizedBox(height: 10),
                   Center(
@@ -165,36 +175,12 @@ class _OnboardingView extends StatelessWidget {
                     ),
                   ),
                 ],
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
-  }
-
-  static Set<String> _selectedIdsFromState(OnboardingState state) {
-    final raw = state.focusArea;
-    if (raw == null || raw.trim().isEmpty) {
-      return <String>{};
-    }
-
-    return raw.split(',').map((value) => value.trim()).where((value) => value.isNotEmpty).toSet();
-  }
-
-  static void _toggleSelection(
-    BuildContext context,
-    String id,
-    Set<String> selectedIds,
-  ) {
-    final next = <String>{...selectedIds};
-    if (next.contains(id)) {
-      next.remove(id);
-    } else {
-      next.add(id);
-    }
-
-    context.read<OnboardingCubit>().updateFocusArea(next.join(','));
   }
 
   static String _hintText(int selectedCount) {

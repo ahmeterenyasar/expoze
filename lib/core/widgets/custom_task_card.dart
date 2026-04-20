@@ -18,6 +18,12 @@ class CustomTaskCard extends StatelessWidget {
     this.titleStyle,
     this.subtitleStyle,
     this.borderColor,
+    this.backgroundColor = AppColors.surface,
+    this.selectedBackgroundColor,
+    this.selectedBorderColor,
+    this.borderWidth = 1,
+    this.selectedBorderWidth = 2,
+    this.selectedTitleColor,
   });
 
   final String title;
@@ -33,18 +39,27 @@ class CustomTaskCard extends StatelessWidget {
   final TextStyle? titleStyle;
   final TextStyle? subtitleStyle;
   final Color? borderColor;
+  final Color backgroundColor;
+  final Color? selectedBackgroundColor;
+  final Color? selectedBorderColor;
+  final double borderWidth;
+  final double selectedBorderWidth;
+  final Color? selectedTitleColor;
 
   @override
   Widget build(BuildContext context) {
+    final effectiveBorderColor = selected ? (selectedBorderColor ?? AppColors.primary) : (borderColor ?? AppColors.neutral250);
+    final effectiveBackgroundColor = selected ? (selectedBackgroundColor ?? backgroundColor) : backgroundColor;
+
     final card = Container(
       width: double.infinity,
       padding: padding,
       decoration: ShapeDecoration(
-        color: AppColors.surface,
+        color: effectiveBackgroundColor,
         shape: RoundedRectangleBorder(
           side: BorderSide(
-            width: 1,
-            color: borderColor ?? AppColors.neutral250,
+            width: selected ? selectedBorderWidth : borderWidth,
+            color: effectiveBorderColor,
           ),
           borderRadius: BorderRadius.circular(borderRadius),
         ),
@@ -81,7 +96,9 @@ class CustomTaskCard extends StatelessWidget {
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: titleStyle ?? AppTextStyles.taskTitle,
+                  style: (titleStyle ?? AppTextStyles.taskTitle).copyWith(
+                    color: selected ? (selectedTitleColor ?? (titleStyle?.color ?? AppTextStyles.taskTitle.color)) : titleStyle?.color,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(

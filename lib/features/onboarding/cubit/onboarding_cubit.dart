@@ -8,13 +8,108 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   OnboardingCubit({required ILocalDbService dbService}) : _dbService = dbService, super(const OnboardingState());
 
   final ILocalDbService _dbService;
+  static const String _defaultUserId = 'local-user';
 
   void start() {
     emit(state.copyWith(status: OnboardingStatus.inProgress, stepIndex: 0, clearErrorMessage: true));
+    _loadSavedFocusAreas();
+  }
+
+  Future<void> _loadSavedFocusAreas() async {
+    try {
+      final user = await _dbService.getUser();
+      final savedFocusAreas = user?.onboardingFocusAreas ?? const <String>[];
+      if (savedFocusAreas.isEmpty) {
+        return;
+      }
+
+      emit(
+        state.copyWith(
+          focusAreas: List<String>.from(savedFocusAreas),
+          focusArea: savedFocusAreas.join(','),
+          createdUser: user,
+          clearErrorMessage: true,
+        ),
+      );
+    } catch (_) {
+      // Loading saved draft is best-effort.
+    }
+  }
+
+  void toggleFocusArea(String value) {
+    final normalized = value.trim();
+    if (normalized.isEmpty) {
+      return;
+    }
+
+    final current = List<String>.from(state.focusAreas);
+    if (current.contains(normalized)) {
+      current.remove(normalized);
+    } else {
+      current.add(normalized);
+    }
+
+    emit(
+      state.copyWith(
+        focusAreas: current,
+        focusArea: current.join(','),
+        clearErrorMessage: true,
+      ),
+    );
   }
 
   void updateFocusArea(String value) {
-    emit(state.copyWith(focusArea: value.trim(), clearErrorMessage: true));
+    final parsed = value.split(',').map((item) => item.trim()).where((item) => item.isNotEmpty).toList();
+
+    emit(
+      state.copyWith(
+        focusAreas: parsed,
+        focusArea: parsed.join(','),
+        clearErrorMessage: true,
+      ),
+    );
+  }
+
+  Future<void> saveStepOneAndContinue() async {
+    final selected = state.focusAreas;
+    if (selected.isEmpty) {
+      emit(
+        state.copyWith(
+          status: OnboardingStatus.error,
+          errorMessage: 'Focus area is required.',
+        ),
+      );
+      return;
+    }
+
+    emit(state.copyWith(isSavingFocusAreas: true, clearErrorMessage: true));
+
+    try {
+      final existingUser = await _dbService.getUser();
+      final nextUser = (existingUser ?? const UserModel(id: _defaultUserId, currentCourageLevel: 1, totalXP: 0)).copyWith(
+        onboardingFocusAreas: List<String>.from(selected),
+      );
+
+      await _dbService.saveUser(nextUser);
+
+      emit(
+        state.copyWith(
+          isSavingFocusAreas: false,
+          createdUser: nextUser,
+          clearErrorMessage: true,
+        ),
+      );
+
+      nextStep();
+    } catch (error) {
+      emit(
+        state.copyWith(
+          status: OnboardingStatus.error,
+          isSavingFocusAreas: false,
+          errorMessage: error.toString(),
+        ),
+      );
+    }
   }
 
   void updateCurrentAnxiety(int value) {
@@ -72,8 +167,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   String? _validateCurrentStep(OnboardingState current) {
     switch (current.stepIndex) {
       case 0:
-        final focus = current.focusArea;
-        if (focus == null || focus.isEmpty) {
+        if (current.focusAreas.isEmpty) {
           return 'Focus area is required.';
         }
       case 1:
