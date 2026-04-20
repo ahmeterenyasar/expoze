@@ -5,6 +5,7 @@ import '../../core/theme/theme.dart';
 import '../../core/widgets/custom_button.dart';
 import '../../core/widgets/custom_task_card.dart';
 import '../../data/services/local_db_service.dart';
+import '../tasks/tasks_screen.dart';
 import 'cubit/onboarding_cubit.dart';
 import 'cubit/onboarding_state.dart';
 
@@ -20,13 +21,15 @@ class OnboardingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => OnboardingCubit(dbService: dbService)..start(),
-      child: const _OnboardingView(),
+      child: _OnboardingView(dbService: dbService),
     );
   }
 }
 
 class _OnboardingView extends StatelessWidget {
-  const _OnboardingView();
+  const _OnboardingView({required this.dbService});
+
+  final ILocalDbService dbService;
 
   static const List<_FocusArea> _options = _FocusArea.values;
 
@@ -36,12 +39,23 @@ class _OnboardingView extends StatelessWidget {
       backgroundColor: AppColors.backgroundCream,
       body: SafeArea(
         child: BlocConsumer<OnboardingCubit, OnboardingState>(
+          listenWhen: (previous, current) {
+            final shouldNavigate = previous.isSavingFocusAreas && !current.isSavingFocusAreas && current.createdUser != null && current.status != OnboardingStatus.error;
+            return shouldNavigate || current.status == OnboardingStatus.error;
+          },
           listener: (context, state) {
             if (state.status == OnboardingStatus.error && state.errorMessage != null) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(state.errorMessage!)),
               );
+              return;
             }
+
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute<void>(
+                builder: (_) => TasksScreen(dbService: dbService),
+              ),
+            );
           },
           builder: (context, state) {
             final selectedIds = state.focusAreas.toSet();

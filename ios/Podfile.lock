@@ -1,0 +1,28 @@
+PODS:
+  - fllama (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+  - isar_flutter_libs (1.0.0):
+    - Flutter
+
+DEPENDENCIES:
+  - fllama (from `.symlinks/plugins/fllama/ios`)
+  - Flutter (from `Flutter`)
+  - isar_flutter_libs (from `.symlinks/plugins/isar_flutter_libs/ios`)
+
+EXTERNAL SOURCES:
+  fllama:
+    :path: ".symlinks/plugins/fllama/ios"
+  Flutter:
+    :path: Flutter
+  isar_flutter_libs:
+    :path: ".symlinks/plugins/isar_flutter_libs/ios"
+
+SPEC CHECKSUMS:
+  fllama: d710313cf141f66abe5dc36806263537427ce878
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  isar_flutter_libs: b69f437aeab9c521821c3f376198c4371fa21073
+
+PODFILE CHECKSUM: 8fe83aa3f9a48195c03a074e73ccb6c3b7f5f499
+
+COCOAPODS: 1.16.2
