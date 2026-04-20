@@ -33,9 +33,11 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effectivePadding = EdgeInsets.fromLTRB(20, 14, 20, 18);
+
     return Container(
       width: double.infinity,
-      padding: padding,
+      padding: effectivePadding,
       decoration: ShapeDecoration(
         color: backgroundColor,
         shape: RoundedRectangleBorder(

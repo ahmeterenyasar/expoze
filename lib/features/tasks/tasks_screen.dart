@@ -133,50 +133,65 @@ class _TasksViewState extends State<_TasksView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundCream,
-      body: SafeArea(
-        child: BlocConsumer<TaskCubit, TaskState>(
-          listener: (context, state) {
-            if (state is TaskError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message)),
-              );
-            }
+      body: BlocConsumer<TaskCubit, TaskState>(
+        listener: (context, state) {
+          if (state is TaskError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
+          }
 
-            if (state is TaskLoaded) {
-              _ensureTasksIfNeeded(state.tasks);
-            }
-          },
-          builder: (context, state) {
-            if (state is TaskLoading && !_didRequestInitialTasks) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
+          if (state is TaskLoaded) {
+            _ensureTasksIfNeeded(state.tasks);
+          }
+        },
+        builder: (context, state) {
+          if (state is TaskLoading && !_didRequestInitialTasks) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
 
-            if (state is TaskLoaded) {
-              return _TasksContent(
-                user: _user,
-                tasks: state.tasks,
-                showCompletionOverlay: _showCompletionOverlay,
-                swipeResetSignal: _swipeResetSignal,
-                onCompleteTask: _handleCompleteTask,
-                onDismissOverlay: _resetCompletionOverlay,
-                onNavItemSelected: _onNavItemSelected,
-              );
-            }
+          if (state is TaskLoaded) {
+            return _TasksContent(
+              user: _user,
+              tasks: state.tasks,
+              showCompletionOverlay: _showCompletionOverlay,
+              swipeResetSignal: _swipeResetSignal,
+              onCompleteTask: _handleCompleteTask,
+              onDismissOverlay: _resetCompletionOverlay,
+            );
+          }
 
-            if (state is TaskError) {
-              return Center(
-                child: Text(
-                  'Could not load tasks right now.',
-                  style: AppTextStyles.body,
-                ),
-              );
-            }
+          if (state is TaskError) {
+            return Center(
+              child: Text(
+                'Could not load tasks right now.',
+                style: AppTextStyles.body,
+              ),
+            );
+          }
 
-            return const SizedBox.shrink();
-          },
-        ),
+          return const SizedBox.shrink();
+        },
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: 0,
+        onItemSelected: _onNavItemSelected,
+        items: const [
+          CustomBottomNavBarItem(
+            label: 'Tasks',
+            icon: Icon(Icons.task_alt_rounded),
+          ),
+          CustomBottomNavBarItem(
+            label: 'Progress',
+            icon: Icon(Icons.bar_chart_rounded),
+          ),
+          CustomBottomNavBarItem(
+            label: 'Profile',
+            icon: Icon(Icons.person_outline_rounded),
+          ),
+        ],
       ),
     );
   }
@@ -190,7 +205,6 @@ class _TasksContent extends StatelessWidget {
     required this.swipeResetSignal,
     required this.onCompleteTask,
     required this.onDismissOverlay,
-    required this.onNavItemSelected,
   });
 
   final UserModel? user;
@@ -199,88 +213,72 @@ class _TasksContent extends StatelessWidget {
   final int swipeResetSignal;
   final ValueChanged<TaskModel> onCompleteTask;
   final VoidCallback onDismissOverlay;
-  final ValueChanged<int> onNavItemSelected;
 
   @override
   Widget build(BuildContext context) {
     final challengeTask = tasks.isNotEmpty ? tasks.first : null;
     final upcomingTasks = tasks.length > 1 ? tasks.skip(1).toList() : const <TaskModel>[];
+    final topInset = MediaQuery.paddingOf(context).top;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final horizontalPadding = (screenWidth * 0.06).clamp(16.0, 28.0);
 
     return Stack(
       children: [
-        Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _Header(user: user),
-                    const SizedBox(height: 22),
-                    if (challengeTask != null)
-                      DailyChallengeCard(
-                        task: challengeTask,
-                        swipeResetSignal: swipeResetSignal,
-                        onComplete: () => onCompleteTask(challengeTask),
-                      )
-                    else
-                      _NoTaskCard(),
-                    const SizedBox(height: 18),
-                    Text(
-                      'Upcoming micro-tasks',
-                      style: AppTextStyles.subtitleCaps.copyWith(
-                        color: AppColors.textSecondary,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Column(
-                      children: upcomingTasks.isEmpty
-                          ? const [
-                              LockedTaskRow(
-                                title: 'Complete your daily challenge first',
-                                subtitle: 'Next tasks unlock after completion',
-                                xpLabel: '+0 XP',
-                              ),
-                            ]
-                          : upcomingTasks
-                                .map(
-                                  (task) => Padding(
-                                    padding: const EdgeInsets.only(bottom: 10),
-                                    child: LockedTaskRow(
-                                      title: task.title,
-                                      subtitle: 'Unlocks after today\'s challenge',
-                                      xpLabel: '+${20 + (task.anxietyLevel * 5)} XP',
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                    ),
-                  ],
+        SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(
+            horizontalPadding,
+            topInset + 20,
+            horizontalPadding,
+            20,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _Header(user: user),
+              const SizedBox(height: 22),
+              if (challengeTask != null)
+                DailyChallengeCard(
+                  task: challengeTask,
+                  swipeResetSignal: swipeResetSignal,
+                  onComplete: () => onCompleteTask(challengeTask),
+                )
+              else
+                _NoTaskCard(),
+              const SizedBox(height: 18),
+              Text(
+                'Upcoming micro-tasks',
+                style: AppTextStyles.subtitleCaps.copyWith(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.8,
                 ),
               ),
-            ),
-            CustomBottomNavBar(
-              currentIndex: 0,
-              onItemSelected: onNavItemSelected,
-              items: const [
-                CustomBottomNavBarItem(
-                  label: 'Tasks',
-                  icon: Icon(Icons.task_alt_rounded),
-                ),
-                CustomBottomNavBarItem(
-                  label: 'Progress',
-                  icon: Icon(Icons.bar_chart_rounded),
-                ),
-                CustomBottomNavBarItem(
-                  label: 'Profile',
-                  icon: Icon(Icons.person_outline_rounded),
-                ),
-              ],
-            ),
-          ],
+              const SizedBox(height: 12),
+              Column(
+                children: upcomingTasks.isEmpty
+                    ? const [
+                        LockedTaskRow(
+                          title: 'Complete your daily challenge first',
+                          subtitle: 'Next tasks unlock after completion',
+                          xpLabel: '+0 XP',
+                        ),
+                      ]
+                    : upcomingTasks
+                          .map(
+                            (task) => Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: LockedTaskRow(
+                                title: task.title,
+                                subtitle: 'Unlocks after today\'s challenge',
+                                xpLabel: '+${20 + (task.anxietyLevel * 5)} XP',
+                              ),
+                            ),
+                          )
+                          .toList(),
+              ),
+              SizedBox(height: MediaQuery.paddingOf(context).bottom + 16),
+            ],
+          ),
         ),
         if (showCompletionOverlay)
           Positioned.fill(
