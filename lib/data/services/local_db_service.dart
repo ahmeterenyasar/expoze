@@ -1,6 +1,8 @@
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../models/profile_preferences_model.dart';
+import '../models/reflection_entry_model.dart';
 import '../models/task_model.dart';
 import '../models/user_model.dart';
 
@@ -15,6 +17,12 @@ abstract class ILocalDbService {
 
   Future<void> saveUser(UserModel user);
   Future<UserModel?> getUser();
+
+  Future<ProfilePreferencesModel?> getProfilePreferences(String userId);
+  Future<void> saveProfilePreferences(ProfilePreferencesModel preferences);
+
+  Future<List<ReflectionEntryModel>> getReflectionEntries(String userId);
+  Future<void> saveReflectionEntry(ReflectionEntryModel entry);
 }
 
 class LocalDbService implements ILocalDbService {
@@ -31,6 +39,8 @@ class LocalDbService implements ILocalDbService {
       <CollectionSchema>[
         TaskModelSchema,
         UserModelSchema,
+        ProfilePreferencesModelSchema,
+        ReflectionEntryModelSchema,
       ],
       name: 'expoze_db',
       directory: (await getApplicationDocumentsDirectory()).path,
@@ -46,7 +56,7 @@ class LocalDbService implements ILocalDbService {
     }
 
     final isar = _isar;
-    if (isar == null || isar.isOpen == false) {
+    if (isar == null || !isar.isOpen) {
       throw StateError('Isar instance is unavailable.');
     }
 
@@ -68,7 +78,6 @@ class LocalDbService implements ILocalDbService {
   @override
   Future<void> upsertTask(TaskModel task) async {
     final isar = _ensureInitialized();
-
     await isar.writeTxn(() async {
       await isar.taskModels.put(task);
     });
@@ -81,7 +90,6 @@ class LocalDbService implements ILocalDbService {
     }
 
     final isar = _ensureInitialized();
-
     await isar.writeTxn(() async {
       await isar.taskModels.putAll(tasks);
     });
@@ -90,7 +98,6 @@ class LocalDbService implements ILocalDbService {
   @override
   Future<void> deleteTask(String taskId) async {
     final isar = _ensureInitialized();
-
     await isar.writeTxn(() async {
       await isar.taskModels.deleteByTaskId(taskId);
     });
@@ -99,7 +106,6 @@ class LocalDbService implements ILocalDbService {
   @override
   Future<void> clearTasks() async {
     final isar = _ensureInitialized();
-
     await isar.writeTxn(() async {
       await isar.taskModels.clear();
     });
@@ -108,7 +114,6 @@ class LocalDbService implements ILocalDbService {
   @override
   Future<void> saveUser(UserModel user) async {
     final isar = _ensureInitialized();
-
     await isar.writeTxn(() async {
       final existing = await isar.userModels.filter().userIdEqualTo(user.userId).findFirst();
       if (existing != null) {
@@ -122,5 +127,45 @@ class LocalDbService implements ILocalDbService {
   Future<UserModel?> getUser() async {
     final isar = _ensureInitialized();
     return isar.userModels.where().findFirst();
+  }
+
+  @override
+  Future<ProfilePreferencesModel?> getProfilePreferences(String userId) async {
+    final isar = _ensureInitialized();
+    return isar.profilePreferencesModels.filter().userIdEqualTo(userId).findFirst();
+  }
+
+  @override
+  Future<void> saveProfilePreferences(ProfilePreferencesModel preferences) async {
+    final isar = _ensureInitialized();
+    await isar.writeTxn(() async {
+      final existing = await isar.profilePreferencesModels
+          .filter()
+          .userIdEqualTo(preferences.userId)
+          .findFirst();
+
+      if (existing != null) {
+        preferences.id = existing.id;
+      }
+      await isar.profilePreferencesModels.put(preferences);
+    });
+  }
+
+  @override
+  Future<List<ReflectionEntryModel>> getReflectionEntries(String userId) async {
+    final isar = _ensureInitialized();
+    return isar.reflectionEntryModels
+        .filter()
+        .userIdEqualTo(userId)
+        .sortByDateDesc()
+        .findAll();
+  }
+
+  @override
+  Future<void> saveReflectionEntry(ReflectionEntryModel entry) async {
+    final isar = _ensureInitialized();
+    await isar.writeTxn(() async {
+      await isar.reflectionEntryModels.put(entry);
+    });
   }
 }
