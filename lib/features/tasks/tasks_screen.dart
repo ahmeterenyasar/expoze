@@ -8,6 +8,7 @@ import '../../data/models/user_model.dart';
 import '../../data/repositories/task_repository.dart';
 import '../../data/services/local_ai_service.dart';
 import '../../data/services/local_db_service.dart';
+import '../profile/profile_screen.dart';
 import 'cubit/task_cubit.dart';
 import 'cubit/task_state.dart';
 import 'widgets/daily_challenge_card.dart';
@@ -122,6 +123,15 @@ class _TasksViewState extends State<_TasksView> {
       return;
     }
 
+    if (index == 2) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(
+          builder: (_) => ProfileScreen(dbService: widget.dbService),
+        ),
+      );
+      return;
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('This section will be available soon.'),
@@ -217,7 +227,9 @@ class _TasksContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final challengeTask = tasks.isNotEmpty ? tasks.first : null;
-    final upcomingTasks = tasks.length > 1 ? tasks.skip(1).toList() : const <TaskModel>[];
+    final upcomingTasks = tasks.length > 1
+        ? tasks.skip(1).toList()
+        : const <TaskModel>[];
     final topInset = MediaQuery.paddingOf(context).top;
     final screenWidth = MediaQuery.sizeOf(context).width;
     final horizontalPadding = (screenWidth * 0.06).clamp(16.0, 28.0);
