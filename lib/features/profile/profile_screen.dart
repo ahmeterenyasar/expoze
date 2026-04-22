@@ -54,7 +54,7 @@ class _ProfileViewState extends State<_ProfileView> {
     super.dispose();
   }
 
-  void _onNavItemSelected(BuildContext context, int index) {
+  void _onNavItemSelected(int index) {
     if (index == 2) {
       return;
     }
@@ -90,9 +90,34 @@ class _ProfileViewState extends State<_ProfileView> {
             }
           },
           builder: (BuildContext context, ProfileState state) {
+            final ProfileCubit profileCubit = context.read<ProfileCubit>();
+
             if (state.status == ProfileStatus.loading ||
                 state.status == ProfileStatus.initial) {
               return const Center(child: CircularProgressIndicator());
+            }
+
+            if (state.status == ProfileStatus.error) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(
+                        state.errorMessage ?? 'Profile could not be loaded.',
+                        style: AppTextStyles.body,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      FilledButton(
+                        onPressed: profileCubit.load,
+                        child: const Text('Try again'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
             }
 
             if (_fearNameController.text != state.draftFearName) {
@@ -132,21 +157,15 @@ class _ProfileViewState extends State<_ProfileView> {
                         items: state.fearMap,
                         selectedIntensity: state.selectedIntensity,
                         fearNameController: _fearNameController,
-                        onDraftChanged: context
-                            .read<ProfileCubit>()
-                            .setDraftFearName,
-                        onIntensitySelected: context
-                            .read<ProfileCubit>()
-                            .setSelectedIntensity,
-                        onAddPressed: context.read<ProfileCubit>().addDraftFear,
-                        onRemove: context.read<ProfileCubit>().removeFearAt,
+                        onDraftChanged: profileCubit.setDraftFearName,
+                        onIntensitySelected: profileCubit.setSelectedIntensity,
+                        onAddPressed: profileCubit.addDraftFear,
+                        onRemove: profileCubit.removeFearAt,
                       ),
                       const SizedBox(height: 14),
                       ProfileTherapyRhythmSection(
                         selectedRhythm: state.selectedRhythm,
-                        onRhythmSelected: context
-                            .read<ProfileCubit>()
-                            .setRhythm,
+                        onRhythmSelected: profileCubit.setRhythm,
                       ),
                       const SizedBox(height: 14),
                       ProfileReflectionArchiveSection(
@@ -162,21 +181,8 @@ class _ProfileViewState extends State<_ProfileView> {
       ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: 2,
-        onItemSelected: (int index) => _onNavItemSelected(context, index),
-        items: const <CustomBottomNavBarItem>[
-          CustomBottomNavBarItem(
-            label: 'Tasks',
-            icon: Icon(Icons.task_alt_rounded),
-          ),
-          CustomBottomNavBarItem(
-            label: 'Progress',
-            icon: Icon(Icons.bar_chart_rounded),
-          ),
-          CustomBottomNavBarItem(
-            label: 'Profile',
-            icon: Icon(Icons.person_outline_rounded),
-          ),
-        ],
+        onItemSelected: _onNavItemSelected,
+        items: appBottomNavItems,
       ),
     );
   }

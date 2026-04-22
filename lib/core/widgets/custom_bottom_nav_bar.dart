@@ -2,6 +2,22 @@ import 'package:flutter/material.dart';
 
 import '../theme/theme.dart';
 
+const List<CustomBottomNavBarItem> appBottomNavItems =
+    <CustomBottomNavBarItem>[
+      CustomBottomNavBarItem(
+        label: 'Tasks',
+        icon: Icon(Icons.task_alt_rounded),
+      ),
+      CustomBottomNavBarItem(
+        label: 'Progress',
+        icon: Icon(Icons.bar_chart_rounded),
+      ),
+      CustomBottomNavBarItem(
+        label: 'Profile',
+        icon: Icon(Icons.person_outline_rounded),
+      ),
+    ];
+
 class CustomBottomNavBar extends StatelessWidget {
   const CustomBottomNavBar({
     super.key,

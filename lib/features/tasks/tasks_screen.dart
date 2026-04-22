@@ -188,20 +188,7 @@ class _TasksViewState extends State<_TasksView> {
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: 0,
         onItemSelected: _onNavItemSelected,
-        items: const [
-          CustomBottomNavBarItem(
-            label: 'Tasks',
-            icon: Icon(Icons.task_alt_rounded),
-          ),
-          CustomBottomNavBarItem(
-            label: 'Progress',
-            icon: Icon(Icons.bar_chart_rounded),
-          ),
-          CustomBottomNavBarItem(
-            label: 'Profile',
-            icon: Icon(Icons.person_outline_rounded),
-          ),
-        ],
+        items: appBottomNavItems,
       ),
     );
   }
