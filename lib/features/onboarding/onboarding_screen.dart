@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../data/content/focus_area_catalog.dart';
+
 import '../../core/theme/theme.dart';
 import '../../core/widgets/custom_button.dart';
 import '../../core/widgets/custom_task_card.dart';
@@ -31,7 +33,7 @@ class _OnboardingView extends StatelessWidget {
 
   final ILocalDbService dbService;
 
-  static const List<_FocusArea> _options = _FocusArea.values;
+  static const List<FocusAreaOption> _options = kFocusAreaCatalog;
 
   @override
   Widget build(BuildContext context) {
@@ -175,92 +177,5 @@ class _OnboardingView extends StatelessWidget {
       return '1 area selected';
     }
     return '$selectedCount areas selected';
-  }
-}
-
-enum _FocusArea {
-  speaking,
-  strangers,
-  eating,
-  calls,
-}
-
-extension _FocusAreaX on _FocusArea {
-  String get id {
-    switch (this) {
-      case _FocusArea.speaking:
-        return 'speaking';
-      case _FocusArea.strangers:
-        return 'strangers';
-      case _FocusArea.eating:
-        return 'eating';
-      case _FocusArea.calls:
-        return 'calls';
-    }
-  }
-
-  String get title {
-    switch (this) {
-      case _FocusArea.speaking:
-        return 'Public speaking';
-      case _FocusArea.strangers:
-        return 'Meeting strangers';
-      case _FocusArea.eating:
-        return 'Eating alone';
-      case _FocusArea.calls:
-        return 'Making phone calls';
-    }
-  }
-
-  String get subtitle {
-    switch (this) {
-      case _FocusArea.speaking:
-        return 'Presentations, talks, toasts';
-      case _FocusArea.strangers:
-        return 'Networking, new places, events';
-      case _FocusArea.eating:
-        return 'Cafes, restaurants, lunch breaks';
-      case _FocusArea.calls:
-        return 'Appointments, orders, check-ins';
-    }
-  }
-
-  IconData get icon {
-    switch (this) {
-      case _FocusArea.speaking:
-        return Icons.mic_none_rounded;
-      case _FocusArea.strangers:
-        return Icons.group_outlined;
-      case _FocusArea.eating:
-        return Icons.restaurant_menu_rounded;
-      case _FocusArea.calls:
-        return Icons.call_outlined;
-    }
-  }
-
-  Color get iconBg {
-    switch (this) {
-      case _FocusArea.speaking:
-        return AppColors.sage150;
-      case _FocusArea.strangers:
-        return const Color(0xFFEEF0FB);
-      case _FocusArea.eating:
-        return const Color(0xFFFAF0EB);
-      case _FocusArea.calls:
-        return const Color(0xFFEAF3DE);
-    }
-  }
-
-  Color get iconColor {
-    switch (this) {
-      case _FocusArea.speaking:
-        return AppColors.primary;
-      case _FocusArea.strangers:
-        return AppColors.lilac500;
-      case _FocusArea.eating:
-        return AppColors.orange600;
-      case _FocusArea.calls:
-        return AppColors.lime700;
-    }
   }
 }
