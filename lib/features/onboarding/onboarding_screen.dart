@@ -62,66 +62,69 @@ class _OnboardingView extends StatelessWidget {
             final selectedCount = selectedIds.length;
             final canContinue = selectedCount > 0;
 
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(28, 20, 28, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Step 1 of 3',
-                        style: AppTextStyles.subtitleCaps.copyWith(
-                          color: AppColors.primary,
-                          letterSpacing: 0,
+            return ScrollConfiguration(
+              behavior: ScrollConfiguration.of(
+                context,
+              ).copyWith(overscroll: false),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(28, 20, 28, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          'Step 1 of 3',
+                          style: AppTextStyles.subtitleCaps.copyWith(
+                            color: AppColors.primary,
+                            letterSpacing: 0,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: SizedBox(
-                            height: 4,
-                            child: Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                Container(color: AppColors.neutral250),
-                                FractionallySizedBox(
-                                  widthFactor: 0.333,
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(color: AppColors.primary),
-                                ),
-                              ],
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: SizedBox(
+                              height: 4,
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  Container(color: AppColors.neutral250),
+                                  FractionallySizedBox(
+                                    widthFactor: 0.333,
+                                    alignment: Alignment.centerLeft,
+                                    child: Container(color: AppColors.primary),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 36),
-                  Text(
-                    'Getting started',
-                    style: AppTextStyles.subtitleCaps,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'What would you like\nto work on today?',
-                    style: AppTextStyles.headline,
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Choose one or more. You can always change this later.',
-                    style: AppTextStyles.body,
-                  ),
-                  const SizedBox(height: 28),
-                  Expanded(
-                    child: ListView.separated(
-                      itemCount: _options.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        final option = _options[index];
-                        final isSelected = selectedIds.contains(option.id);
-                        return CustomTaskCard(
+                      ],
+                    ),
+                    const SizedBox(height: 36),
+                    Text(
+                      'Getting started',
+                      style: AppTextStyles.subtitleCaps,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'What would you like\nto work on today?',
+                      style: AppTextStyles.headline,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Choose one or more. You can always change this later.',
+                      style: AppTextStyles.body,
+                    ),
+                    const SizedBox(height: 28),
+                    ..._options.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final option = entry.value;
+                      final isSelected = selectedIds.contains(option.id);
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: index == _options.length - 1 ? 0 : 12),
+                        child: CustomTaskCard(
                           title: option.title,
                           subtitle: option.subtitle,
                           selected: isSelected,
@@ -136,26 +139,26 @@ class _OnboardingView extends StatelessWidget {
                           borderWidth: 1.5,
                           selectedBorderWidth: 2,
                           selectedTitleColor: const Color(0xFF1D5C4F),
-                        );
-                      },
+                        ),
+                      );
+                    }),
+                    const SizedBox(height: 20),
+                    CustomButton(
+                      label: state.isSavingFocusAreas ? 'Saving...' : 'Continue',
+                      enabled: canContinue && !state.isSavingFocusAreas,
+                      onPressed: canContinue && !state.isSavingFocusAreas ? () => context.read<OnboardingCubit>().saveStepOneAndContinue() : null,
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  CustomButton(
-                    label: state.isSavingFocusAreas ? 'Saving...' : 'Continue',
-                    enabled: canContinue && !state.isSavingFocusAreas,
-                    onPressed: canContinue && !state.isSavingFocusAreas ? () => context.read<OnboardingCubit>().saveStepOneAndContinue() : null,
-                  ),
-                  const SizedBox(height: 10),
-                  Center(
-                    child: Text(
-                      _hintText(selectedCount),
-                      style: AppTextStyles.taskSubtitle.copyWith(
-                        color: const Color(0xFF9BB5AF),
+                    const SizedBox(height: 10),
+                    Center(
+                      child: Text(
+                        _hintText(selectedCount),
+                        style: AppTextStyles.taskSubtitle.copyWith(
+                          color: const Color(0xFF9BB5AF),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },
