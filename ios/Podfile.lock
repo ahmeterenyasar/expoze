@@ -4,11 +4,15 @@ PODS:
   - Flutter (1.0.0)
   - isar_flutter_libs (1.0.0):
     - Flutter
+  - path_provider_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
 
 DEPENDENCIES:
   - fllama (from `.symlinks/plugins/fllama/ios`)
   - Flutter (from `Flutter`)
   - isar_flutter_libs (from `.symlinks/plugins/isar_flutter_libs/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
 
 EXTERNAL SOURCES:
   fllama:
@@ -17,11 +21,14 @@ EXTERNAL SOURCES:
     :path: Flutter
   isar_flutter_libs:
     :path: ".symlinks/plugins/isar_flutter_libs/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
 
 SPEC CHECKSUMS:
-  fllama: d710313cf141f66abe5dc36806263537427ce878
+  fllama: 3b57c5b47a584844e4cb82c8476237d59b8db74c
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  isar_flutter_libs: b69f437aeab9c521821c3f376198c4371fa21073
+  isar_flutter_libs: 9fc2cfb928c539e1b76c481ba5d143d556d94920
+  path_provider_foundation: bb55f6dbba17d0dccd6737fe6f7f34fbd0376880
 
 PODFILE CHECKSUM: 8fe83aa3f9a48195c03a074e73ccb6c3b7f5f499
 

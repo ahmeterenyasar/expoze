@@ -91,6 +91,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       );
 
       await _dbService.saveUser(nextUser);
+      await _dbService.clearTasks();
 
       emit(
         state.copyWith(

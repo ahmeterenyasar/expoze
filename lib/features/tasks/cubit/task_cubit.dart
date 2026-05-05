@@ -19,11 +19,11 @@ class TaskCubit extends Cubit<TaskState> {
     }
   }
 
-  Future<void> generateTasks({required String focusArea, required int currentAnxiety}) async {
+  Future<void> generateTasks({required List<String> focusAreas, required int currentAnxiety}) async {
     emit(const TaskLoading());
 
     try {
-      await _taskRepository.generateNewTasks(focusArea: focusArea, currentAnxiety: currentAnxiety);
+      await _taskRepository.generateNewTasks(focusAreas: focusAreas, currentAnxiety: currentAnxiety);
       final updatedTasks = await _taskRepository.getUpcomingTasks();
       emit(TaskLoaded(tasks: updatedTasks));
     } catch (error) {

@@ -76,22 +76,22 @@ class _TasksViewState extends State<_TasksView> {
     }
 
     _didRequestInitialTasks = true;
-    final focusArea = _resolveFocusArea();
+    final focusAreas = _resolveFocusAreas();
     final anxiety = _resolveCurrentAnxiety();
 
     await context.read<TaskCubit>().generateTasks(
-      focusArea: focusArea,
+      focusAreas: focusAreas,
       currentAnxiety: anxiety,
     );
   }
 
-  String _resolveFocusArea() {
+  List<String> _resolveFocusAreas() {
     final focusAreas = _user?.onboardingFocusAreas ?? const <String>[];
     if (focusAreas.isEmpty) {
-      return 'social confidence';
+      return const <String>['speaking'];
     }
 
-    return focusAreas.first;
+    return focusAreas;
   }
 
   int _resolveCurrentAnxiety() {

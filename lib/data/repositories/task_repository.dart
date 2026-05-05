@@ -5,7 +5,7 @@ import '../services/local_db_service.dart';
 abstract class ITaskRepository {
   Future<List<TaskModel>> getUpcomingTasks();
   Future<TaskModel> completeTask(String taskId);
-  Future<List<TaskModel>> generateNewTasks({required String focusArea, required int currentAnxiety});
+  Future<List<TaskModel>> generateNewTasks({required List<String> focusAreas, required int currentAnxiety});
 }
 
 class TaskRepository implements ITaskRepository {
@@ -33,8 +33,8 @@ class TaskRepository implements ITaskRepository {
   }
 
   @override
-  Future<List<TaskModel>> generateNewTasks({required String focusArea, required int currentAnxiety}) async {
-    final newTasks = await _aiService.generateNextTasks(focusArea, currentAnxiety);
+  Future<List<TaskModel>> generateNewTasks({required List<String> focusAreas, required int currentAnxiety}) async {
+    final newTasks = await _aiService.generateNextTasks(focusAreas, currentAnxiety);
     await _dbService.upsertTasks(newTasks);
     return newTasks;
   }

@@ -38,12 +38,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<bool> _resolveShouldShowOnboarding() async {
-    final user = await widget.dbService.getUser();
-    if (user == null) {
-      return true;
-    }
-
-    return user.onboardingFocusAreas.isEmpty;
+    return true;
   }
 
   @override
