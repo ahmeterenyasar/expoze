@@ -223,60 +223,65 @@ class _TasksContent extends StatelessWidget {
 
     return Stack(
       children: [
-        SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(
-            horizontalPadding,
-            topInset + 20,
-            horizontalPadding,
-            20,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _Header(user: user),
-              const SizedBox(height: 22),
-              if (challengeTask != null)
-                DailyChallengeCard(
-                  task: challengeTask,
-                  swipeResetSignal: swipeResetSignal,
-                  onComplete: () => onCompleteTask(challengeTask),
-                )
-              else
-                _NoTaskCard(),
-              const SizedBox(height: 18),
-              Text(
-                'Upcoming micro-tasks',
-                style: AppTextStyles.subtitleCaps.copyWith(
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.8,
+        ScrollConfiguration(
+          behavior: ScrollConfiguration.of(
+            context,
+          ).copyWith(overscroll: false),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+              horizontalPadding,
+              topInset + 20,
+              horizontalPadding,
+              20,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _Header(user: user),
+                const SizedBox(height: 22),
+                if (challengeTask != null)
+                  DailyChallengeCard(
+                    task: challengeTask,
+                    swipeResetSignal: swipeResetSignal,
+                    onComplete: () => onCompleteTask(challengeTask),
+                  )
+                else
+                  _NoTaskCard(),
+                const SizedBox(height: 18),
+                Text(
+                  'Upcoming micro-tasks',
+                  style: AppTextStyles.subtitleCaps.copyWith(
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.8,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Column(
-                children: upcomingTasks.isEmpty
-                    ? const [
-                        LockedTaskRow(
-                          title: 'Complete your daily challenge first',
-                          subtitle: 'Next tasks unlock after completion',
-                          xpLabel: '+0 XP',
-                        ),
-                      ]
-                    : upcomingTasks
-                          .map(
-                            (task) => Padding(
-                              padding: const EdgeInsets.only(bottom: 10),
-                              child: LockedTaskRow(
-                                title: task.title,
-                                subtitle: 'Unlocks after today\'s challenge',
-                                xpLabel: '+${20 + (task.anxietyLevel * 5)} XP',
+                const SizedBox(height: 12),
+                Column(
+                  children: upcomingTasks.isEmpty
+                      ? const [
+                          LockedTaskRow(
+                            title: 'Complete your daily challenge first',
+                            subtitle: 'Next tasks unlock after completion',
+                            xpLabel: '+0 XP',
+                          ),
+                        ]
+                      : upcomingTasks
+                            .map(
+                              (task) => Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: LockedTaskRow(
+                                  title: task.title,
+                                  subtitle: 'Unlocks after today\'s challenge',
+                                  xpLabel: '+${20 + (task.anxietyLevel * 5)} XP',
+                                ),
                               ),
-                            ),
-                          )
-                          .toList(),
-              ),
-              SizedBox(height: MediaQuery.paddingOf(context).bottom + 16),
-            ],
+                            )
+                            .toList(),
+                ),
+                SizedBox(height: MediaQuery.paddingOf(context).bottom + 16),
+              ],
+            ),
           ),
         ),
         if (showCompletionOverlay)
